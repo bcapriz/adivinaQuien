@@ -30,11 +30,36 @@ public class EspacioDeBusqueda {
      * la adivinanza directa sin necesidad de mas filtros.
      * Caso de error: tamanio()==0 indica filtro inconsistente con respuesta
      * previa; se trata como excepcion de dominio en la capa de Partida.
+     *
+     * Esta sobrecarga equivale a aplicarFiltro(filtro, true): conserva los
+     * candidatos que cumplen el filtro. Es el caso que usa la simulacion
+     * greedy de MaquinaAsertiva (SDD 4.3), donde se estima el subconjunto
+     * resultante suponiendo respuesta afirmativa.
      */
     public EspacioDeBusqueda aplicarFiltro(Filtro filtro) {
+        return aplicarFiltro(filtro, true);
+    }
+
+    /**
+     * DIVIDE & CONQUISTA — paso de particion segun la respuesta real.
+     *
+     * Un filtro es una pregunta sobre el personaje secreto del rival. La
+     * respuesta (si/no) la calcula Partida puertas adentro del dueno del
+     * secreto (SDD constitucion punto 3, supuesto 2.3.1). Este metodo parte
+     * el espacio quedandose con los candidatos consistentes con esa respuesta:
+     *   - respuesta true  -> candidatos que cumplen el filtro
+     *   - respuesta false -> candidatos que NO lo cumplen (subconjunto complementario)
+     *
+     * Sin esta particion por respuesta, un filtro cuya respuesta real es "no"
+     * descartaria al propio personaje secreto del conjunto de candidatos y el
+     * jugador nunca podria acertar por reduccion.
+     *
+     * Complejidad: Theta(n) sobre el subconjunto vigente (SDD 4.2).
+     */
+    public EspacioDeBusqueda aplicarFiltro(Filtro filtro, boolean respuesta) {
         List<Personaje> restantes = new ArrayList<>();
         for (Personaje candidato : candidatos) {
-            if (filtro.cumple(candidato)) {
+            if (filtro.cumple(candidato) == respuesta) {
                 restantes.add(candidato);
             }
         }

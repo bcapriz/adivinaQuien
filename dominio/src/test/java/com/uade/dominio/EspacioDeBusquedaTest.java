@@ -78,6 +78,34 @@ class EspacioDeBusquedaTest {
         assertEquals(2, resultado.tamanio()); // Bob, Elena
     }
 
+    // --- particion por respuesta real (si/no) ---
+
+    @Test
+    void aplicarFiltroConRespuestaFalsaDevuelveElComplemento() {
+        var resultado = espacioCompleto.aplicarFiltro(new Filtro(Categoria.GENERO, Genero.FEMENINO), false);
+
+        assertEquals(2, resultado.tamanio()); // Bob, Diego (los que NO son femeninos)
+        assertTrue(resultado.getCandidatos().stream().allMatch(p -> p.getGenero() == Genero.MASCULINO));
+    }
+
+    @Test
+    void aplicarFiltroConRespuestaVerdaderaEquivaleALaSobrecargaDeUnArgumento() {
+        var filtro = new Filtro(Categoria.CALVICIE, Boolean.TRUE);
+
+        assertEquals(
+                espacioCompleto.aplicarFiltro(filtro).getCandidatos(),
+                espacioCompleto.aplicarFiltro(filtro, true).getCandidatos());
+    }
+
+    @Test
+    void particionesComplementariasCubrenTodoElEspacio() {
+        var filtro = new Filtro(Categoria.COLOR_PELO, ColorPelo.NEGRO);
+        int conNegro = espacioCompleto.aplicarFiltro(filtro, true).tamanio();
+        int sinNegro = espacioCompleto.aplicarFiltro(filtro, false).tamanio();
+
+        assertEquals(espacioCompleto.tamanio(), conNegro + sinNegro);
+    }
+
     // --- caso base: tamanio 1 ---
 
     @Test

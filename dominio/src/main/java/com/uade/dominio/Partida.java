@@ -47,8 +47,10 @@ public class Partida {
         Accion accion = turnoActual.decidirTurno(
                 new EstadoVisible(espacioPropio, historialPropio, historialRival));
 
+        Boolean respuestaFiltro = null;
+
         if (accion instanceof Accion.Adivinanza a) {
-            if (a.personaje().getId() == secretoRival.getId()) {
+            if (evaluarAdivinanza(a, secretoRival)) {
                 terminada = true;
                 ganador   = turnoActual;
             }
@@ -56,21 +58,38 @@ public class Partida {
             /*
              * DIVIDE & CONQUER — paso recursivo (SDD 4.1 / 4.2)
              * El jugador eligio un filtro (decision Greedy, implementada en cada
-             * maquina). Partida lo aplica sobre el espacio propio y recursa
-             * implicitamente: el siguiente decidirTurno recibe el subconjunto
-             * reducido. Esquema: D&C(espacio) → elegirFiltro [Greedy] →
-             * aplicarFiltro [D&C] → D&C(subconjunto).
-             * La recursion termina cuando esUnico()==true y el jugador lanza
-             * Accion.Adivinanza en lugar de Accion.AplicarFiltro.
+             * maquina). Partida evalua la respuesta puertas adentro del dueno
+             * del secreto (evaluarFiltro) y parte el espacio propio segun esa
+             * respuesta si/no; recursa implicitamente: el siguiente decidirTurno
+             * recibe el subconjunto reducido. Esquema: D&C(espacio) →
+             * elegirFiltro [Greedy] → evaluarFiltro + aplicarFiltro [D&C] →
+             * D&C(subconjunto). La recursion termina cuando esUnico()==true y el
+             * jugador lanza Accion.Adivinanza en lugar de Accion.AplicarFiltro.
              */
-            EspacioDeBusqueda reducido = espacioPropio.aplicarFiltro(f.filtro());
+            respuestaFiltro = evaluarFiltro(f.filtro(), secretoRival);
+            EspacioDeBusqueda reducido = espacioPropio.aplicarFiltro(f.filtro(), respuestaFiltro);
             historialPropio.add(f.filtro());
             if (esA) espacioA = reducido; else espacioB = reducido;
         }
 
         Jugador jugadorDelTurno = turnoActual;
         turnoActual = esA ? jugadorB : jugadorA;
-        return new ResultadoTurno(jugadorDelTurno, accion, terminada, ganador);
+        return new ResultadoTurno(jugadorDelTurno, accion, respuestaFiltro, terminada, ganador);
+    }
+
+    /**
+     * Evaluacion del secreto "puertas adentro" (SDD constitucion punto 3,
+     * supuesto 2.3.1). Un filtro es una pregunta sobre el personaje secreto
+     * del rival; responde si/no sin exponer el objeto Personaje. Ningun
+     * Jugador tiene acceso a este metodo ni a secretoRival: solo Partida.
+     */
+    private boolean evaluarFiltro(Filtro filtro, Personaje secretoRival) {
+        return filtro.cumple(secretoRival);
+    }
+
+    /** Evaluacion de una adivinanza directa contra el secreto del rival. */
+    private boolean evaluarAdivinanza(Accion.Adivinanza adivinanza, Personaje secretoRival) {
+        return adivinanza.personaje().getId() == secretoRival.getId();
     }
 
     public boolean estaTerminada() {

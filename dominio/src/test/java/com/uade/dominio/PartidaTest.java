@@ -101,6 +101,87 @@ class PartidaTest {
             () -> partida.getHistorialFiltros(a).add(new Filtro(Categoria.LENTES, Boolean.FALSE)));
     }
 
+    // --- evaluacion del filtro contra el secreto del rival ---
+
+    @Test
+    void respuestaDelFiltroEsTrueCuandoElSecretoDelRivalLoCumple() {
+        // A pregunta GENERO=MASCULINO; el secreto de B es Bob (MASCULINO) -> SI
+        Jugador a = jugadorFijo(ana, new Accion.AplicarFiltro(new Filtro(Categoria.GENERO, Genero.MASCULINO)));
+        Jugador b = soloElije(bob);
+
+        var resultado = new Partida(a, b, registro).jugarTurno();
+
+        assertEquals(Boolean.TRUE, resultado.getRespuestaFiltro());
+    }
+
+    @Test
+    void respuestaDelFiltroEsFalseCuandoElSecretoDelRivalNoLoCumple() {
+        // A pregunta GENERO=MASCULINO; el secreto de B es Ana (FEMENINO) -> NO
+        Jugador a = jugadorFijo(bob, new Accion.AplicarFiltro(new Filtro(Categoria.GENERO, Genero.MASCULINO)));
+        Jugador b = soloElije(ana);
+
+        var resultado = new Partida(a, b, registro).jugarTurno();
+
+        assertEquals(Boolean.FALSE, resultado.getRespuestaFiltro());
+    }
+
+    @Test
+    void adivinanzaNoTieneRespuestaDeFiltro() {
+        Jugador a = jugadorFijo(ana, new Accion.Adivinanza(carla));
+        Jugador b = soloElije(bob);
+
+        var resultado = new Partida(a, b, registro).jugarTurno();
+
+        assertNull(resultado.getRespuestaFiltro());
+    }
+
+    @Test
+    void unJugadorConvergeAlSecretoDelRivalAunConRespuestasNegativas() {
+        // Secreto de B = Diego (id 4). El cazador filtra por categorias sucesivas
+        // usando como referencia el primer candidato visible; la particion por
+        // respuesta real (incluida "no") mantiene a Diego en el conjunto.
+        Personaje diego = registro.listar().get(3);
+        Jugador cazador = cazadorSecuencial(ana);
+        Jugador b = soloElije(diego);
+
+        var partida = new Partida(cazador, b, registro);
+        Jugador ganador = null;
+        for (int i = 0; i < 12 && !partida.estaTerminada(); i++) {
+            ganador = partida.jugarTurno().getGanador();
+        }
+
+        assertTrue(partida.estaTerminada());
+        assertEquals(cazador, ganador);
+    }
+
+    private Jugador cazadorSecuencial(Personaje propio) {
+        return new Jugador() {
+            private final java.util.List<Categoria> pendientes =
+                    new java.util.ArrayList<>(Categoria.ORDEN_FIJO);
+
+            @Override public Personaje elegirPersonaje(RegistroDePersonajes r, List<Personaje> ya) { return propio; }
+
+            @Override public Accion decidirTurno(EstadoDePartidaVisible estado) {
+                EspacioDeBusqueda espacio = estado.getEspacioDeBusqueda();
+                if (espacio.esUnico()) {
+                    return new Accion.Adivinanza(espacio.unico());
+                }
+                Categoria categoria = pendientes.remove(0);
+                Personaje referencia = espacio.getCandidatos().get(0);
+                return new Accion.AplicarFiltro(filtroDe(categoria, referencia));
+            }
+        };
+    }
+
+    private static Filtro filtroDe(Categoria categoria, Personaje p) {
+        return switch (categoria) {
+            case GENERO     -> new Filtro(categoria, p.getGenero());
+            case CALVICIE   -> new Filtro(categoria, p.isCalvo());
+            case LENTES     -> new Filtro(categoria, p.isUsaLentes());
+            case COLOR_PELO -> new Filtro(categoria, p.getColorPelo());
+        };
+    }
+
     // --- estado de la partida ---
 
     @Test
