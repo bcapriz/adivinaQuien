@@ -5,7 +5,7 @@ import com.uade.dominio.*;
 import java.util.List;
 import java.util.Random;
 
-// Implementado en Sprint 4
+
 public class MaquinaAsertiva implements Jugador {
 
     private final Random random = new Random();

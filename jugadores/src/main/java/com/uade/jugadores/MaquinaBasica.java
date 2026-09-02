@@ -5,7 +5,6 @@ import com.uade.dominio.*;
 import java.util.List;
 import java.util.Random;
 
-// Implementado en Sprint 3
 public class MaquinaBasica implements Jugador {
 
     private final Random random = new Random();
