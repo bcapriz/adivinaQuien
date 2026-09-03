@@ -45,7 +45,8 @@ public class ModoHumanoVsMaquina {
 
         if (accion instanceof Accion.AplicarFiltro f) {
             String respuesta = Boolean.TRUE.equals(resultado.getRespuestaFiltro()) ? "SI" : "NO";
-            consola.mostrar(quien + "  ->  filtro " + f.filtro() + "  ->  " + respuesta);
+            consola.mostrar(quien + "  ->  filtro " + f.filtro() + "  ->  " + respuesta
+                    + "   (quedan " + resultado.getCandidatosRestantes() + ")");
         } else if (accion instanceof Accion.Adivinanza a) {
             String desenlace = resultado.isPartidaTerminada() ? "ACERTO" : "erro";
             consola.mostrar(quien + "  ->  adivina " + a.personaje().getNombre() + "  ->  " + desenlace);

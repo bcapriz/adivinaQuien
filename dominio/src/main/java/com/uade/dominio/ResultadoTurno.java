@@ -5,14 +5,16 @@ public class ResultadoTurno {
     private final Jugador jugador;
     private final Accion accion;
     private final Boolean respuestaFiltro; // si/no cuando la accion fue AplicarFiltro; null si fue Adivinanza
+    private final int candidatosRestantes;
     private final boolean partidaTerminada;
     private final Jugador ganador;
 
     public ResultadoTurno(Jugador jugador, Accion accion, Boolean respuestaFiltro,
-                          boolean partidaTerminada, Jugador ganador) {
+                          int candidatosRestantes, boolean partidaTerminada, Jugador ganador) {
         this.jugador = jugador;
         this.accion = accion;
         this.respuestaFiltro = respuestaFiltro;
+        this.candidatosRestantes = candidatosRestantes;
         this.partidaTerminada = partidaTerminada;
         this.ganador = ganador;
     }
@@ -26,6 +28,9 @@ public class ResultadoTurno {
      * null si fue una Adivinanza.
      */
     public Boolean getRespuestaFiltro() { return respuestaFiltro; }
+
+    /** Cantidad de candidatos que le quedan al jugador del turno tras jugar esta accion. */
+    public int getCandidatosRestantes() { return candidatosRestantes; }
 
     public boolean isPartidaTerminada() { return partidaTerminada; }
     public Jugador getGanador() { return ganador; }

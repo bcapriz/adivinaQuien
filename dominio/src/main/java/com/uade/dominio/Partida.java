@@ -17,13 +17,21 @@ public class Partida {
     private final List<Filtro> historialA = new ArrayList<>();
     private final List<Filtro> historialB = new ArrayList<>();
 
+    private final List<ObservadorDePartida> observadores;
+
     private boolean terminada = false;
     private Jugador ganador = null;
     private Jugador turnoActual;
 
     public Partida(Jugador jugadorA, Jugador jugadorB, RegistroDePersonajes registro) {
+        this(jugadorA, jugadorB, registro, List.of());
+    }
+
+    public Partida(Jugador jugadorA, Jugador jugadorB, RegistroDePersonajes registro,
+                   List<ObservadorDePartida> observadores) {
         this.jugadorA = jugadorA;
         this.jugadorB = jugadorB;
+        this.observadores = List.copyOf(observadores);
 
         List<Personaje> yaElegidos = new ArrayList<>();
         this.personajeSecretoA = jugadorA.elegirPersonaje(registro, yaElegidos);
@@ -71,7 +79,16 @@ public class Partida {
 
         Jugador jugadorDelTurno = turnoActual;
         turnoActual = esA ? jugadorB : jugadorA;
-        return new ResultadoTurno(jugadorDelTurno, accion, respuestaFiltro, terminada, ganador);
+
+        int candidatosRestantes = (esA ? espacioA : espacioB).tamanio();
+        ResultadoTurno resultado = new ResultadoTurno(
+                jugadorDelTurno, accion, respuestaFiltro, candidatosRestantes, terminada, ganador);
+
+        observadores.forEach(observador -> observador.onTurnoJugado(resultado));
+        if (terminada) {
+            observadores.forEach(observador -> observador.onPartidaTerminada(ganador));
+        }
+        return resultado;
     }
 
     /**

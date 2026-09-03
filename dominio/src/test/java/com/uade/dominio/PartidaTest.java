@@ -214,4 +214,48 @@ class PartidaTest {
         assertEquals(a, r1.getJugador());
         assertEquals(b, r2.getJugador());
     }
+
+    // --- candidatos restantes y observadores ---
+
+    @Test
+    void resultadoInformaLosCandidatosQueLeQuedanAlJugadorTrasElFiltro() {
+        // A pregunta GENERO=MASCULINO; el secreto de B es Bob (MASCULINO) -> SI
+        // El registro tiene 2 masculinos (Bob, Diego) y 2 femeninas.
+        Jugador a = jugadorFijo(ana, new Accion.AplicarFiltro(new Filtro(Categoria.GENERO, Genero.MASCULINO)));
+        Jugador b = soloElije(bob);
+
+        var resultado = new Partida(a, b, registro).jugarTurno();
+
+        assertEquals(2, resultado.getCandidatosRestantes());
+    }
+
+    @Test
+    void notificaAlObservadorCadaTurnoYElFinDePartida() {
+        var observador = new ObservadorSpy();
+        Jugador a = jugadorFijo(ana, new Accion.Adivinanza(bob));
+        Jugador b = soloElije(bob);
+
+        var partida = new Partida(a, b, registro, List.of(observador));
+        partida.jugarTurno();
+
+        assertEquals(1, observador.turnos.size());
+        assertSame(a, observador.turnos.get(0).getJugador());
+        assertSame(a, observador.ganador);
+    }
+
+    @Test
+    void unaPartidaSinObservadoresFuncionaIgual() {
+        Jugador a = jugadorFijo(ana, new Accion.Adivinanza(bob));
+        var partida = new Partida(a, soloElije(bob), registro);
+
+        assertTrue(partida.jugarTurno().isPartidaTerminada());
+    }
+
+    private static final class ObservadorSpy implements ObservadorDePartida {
+        final List<ResultadoTurno> turnos = new java.util.ArrayList<>();
+        Jugador ganador;
+
+        @Override public void onTurnoJugado(ResultadoTurno resultado) { turnos.add(resultado); }
+        @Override public void onPartidaTerminada(Jugador ganador) { this.ganador = ganador; }
+    }
 }
