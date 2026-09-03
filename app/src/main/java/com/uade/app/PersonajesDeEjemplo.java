@@ -5,12 +5,9 @@ import com.uade.dominio.Genero;
 import com.uade.dominio.RegistroDePersonajes;
 
 /**
- * Roster estandar de 23 personajes para jugar por consola. Se cargan agrupados
- * por genero (masculinos y luego femeninas), como pide la consigna (SDD 2.2);
- * el ID autoincremental lo asigna {@link RegistroDePersonajes} en el alta.
- *
- * El alta interactiva de personajes (HU-1) queda fuera del alcance del Sprint 3:
- * este roster fijo alcanza para ejercitar el modo de juego.
+ * Roster fijo de 23 personajes para jugar por consola. Se cargan agrupados por
+ * genero (masculinos y luego femeninas); el ID autoincremental lo asigna
+ * {@link RegistroDePersonajes} en el alta.
  */
 public final class PersonajesDeEjemplo {
 

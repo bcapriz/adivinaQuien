@@ -56,15 +56,12 @@ public class Partida {
             }
         } else if (accion instanceof Accion.AplicarFiltro f) {
             /*
-             * DIVIDE & CONQUER — paso recursivo (SDD 4.1 / 4.2)
-             * El jugador eligio un filtro (decision Greedy, implementada en cada
-             * maquina). Partida evalua la respuesta puertas adentro del dueno
-             * del secreto (evaluarFiltro) y parte el espacio propio segun esa
-             * respuesta si/no; recursa implicitamente: el siguiente decidirTurno
-             * recibe el subconjunto reducido. Esquema: D&C(espacio) →
-             * elegirFiltro [Greedy] → evaluarFiltro + aplicarFiltro [D&C] →
-             * D&C(subconjunto). La recursion termina cuando esUnico()==true y el
-             * jugador lanza Accion.Adivinanza en lugar de Accion.AplicarFiltro.
+             * Paso recursivo del divide & conquer. El jugador eligió un filtro
+             * (decisión greedy propia de cada máquina); Partida evalúa la
+             * respuesta puertas adentro del dueño del secreto y parte el espacio
+             * propio según ese sí/no. El siguiente decidirTurno recibe el
+             * subconjunto reducido. La recursión termina cuando el espacio queda
+             * en un único candidato y el jugador lanza una Adivinanza.
              */
             respuestaFiltro = evaluarFiltro(f.filtro(), secretoRival);
             EspacioDeBusqueda reducido = espacioPropio.aplicarFiltro(f.filtro(), respuestaFiltro);
@@ -78,10 +75,10 @@ public class Partida {
     }
 
     /**
-     * Evaluacion del secreto "puertas adentro" (SDD constitucion punto 3,
-     * supuesto 2.3.1). Un filtro es una pregunta sobre el personaje secreto
-     * del rival; responde si/no sin exponer el objeto Personaje. Ningun
-     * Jugador tiene acceso a este metodo ni a secretoRival: solo Partida.
+     * Evaluación del secreto "puertas adentro". Un filtro es una pregunta sobre
+     * el personaje secreto del rival; responde sí/no sin exponer el objeto
+     * Personaje. Ningún Jugador tiene acceso a este método ni a secretoRival:
+     * solo Partida.
      */
     private boolean evaluarFiltro(Filtro filtro, Personaje secretoRival) {
         return filtro.cumple(secretoRival);

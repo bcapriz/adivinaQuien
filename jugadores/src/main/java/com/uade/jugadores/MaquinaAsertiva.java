@@ -3,26 +3,63 @@ package com.uade.jugadores;
 import com.uade.dominio.*;
 
 import java.util.List;
-import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+/**
+ * Función de selección greedy real. Para cada filtro factible (categoría no
+ * usada por mí) simula las dos ramas de respuesta y se queda con el que deja el
+ * subconjunto restante más chico en el peor caso de respuesta, es decir el que
+ * más reduce en el peor caso. Decide localmente, sin backtracking ni garantía de
+ * óptimo global.
+ *
+ * Con {@code informada = true} además lee el historial de filtros del rival
+ * ({@link EstadoDePartidaVisible#getHistorialFiltrosRival()}) y, ante empate en
+ * la reducción del peor caso, desempata hacia una categoría que el rival todavía
+ * no exploró — evita redundancia sin resignar reducción.
+ */
+public class MaquinaAsertiva extends MotorDeBusquedaDeMaquina {
 
-public class MaquinaAsertiva implements Jugador {
+    private final boolean informada;
 
-    private final Random random = new Random();
+    public MaquinaAsertiva() {
+        this(false);
+    }
 
-    @Override
-    public Personaje elegirPersonaje(RegistroDePersonajes registro, List<Personaje> yaElegidos) {
-        List<Personaje> disponibles = registro.listar().stream()
-                .filter(p -> !yaElegidos.contains(p))
-                .toList();
-        if (disponibles.isEmpty()) {
-            throw new IllegalStateException("No hay personajes disponibles para elegir");
-        }
-        return disponibles.get(random.nextInt(disponibles.size()));
+    public MaquinaAsertiva(boolean informada) {
+        this.informada = informada;
     }
 
     @Override
-    public Accion decidirTurno(EstadoDePartidaVisible estado) {
-        throw new UnsupportedOperationException("Sprint 4");
+    protected Filtro elegirFiltro(EstadoDePartidaVisible estado) {
+        EspacioDeBusqueda espacio = estado.getEspacioDeBusqueda();
+        List<Categoria> disponibles = categoriasSinUsar(estado.getHistorialFiltros());
+        Set<Categoria> usadasPorElRival = informada
+                ? estado.getHistorialFiltrosRival().stream().map(Filtro::getCategoria).collect(Collectors.toSet())
+                : Set.of();
+
+        Filtro mejor = null;
+        int mejorPeorCaso = Integer.MAX_VALUE;
+        int mejorRedundancia = Integer.MAX_VALUE;
+
+        for (Categoria categoria : disponibles) {
+            int redundancia = usadasPorElRival.contains(categoria) ? 1 : 0;
+            for (Object valor : categoria.valoresPosibles()) {
+                Filtro candidato = new Filtro(categoria, valor);
+                int siRespondeSi = espacio.aplicarFiltro(candidato, true).tamanio();
+                int siRespondeNo = espacio.aplicarFiltro(candidato, false).tamanio();
+                if (siRespondeSi == 0 || siRespondeNo == 0) {
+                    continue; // no separa nada: su respuesta ya está determinada
+                }
+                int peorCaso = Math.max(siRespondeSi, siRespondeNo);
+                if (peorCaso < mejorPeorCaso
+                        || (peorCaso == mejorPeorCaso && redundancia < mejorRedundancia)) {
+                    mejor = candidato;
+                    mejorPeorCaso = peorCaso;
+                    mejorRedundancia = redundancia;
+                }
+            }
+        }
+        return mejor; // null si ninguna categoría disponible separa el espacio
     }
 }

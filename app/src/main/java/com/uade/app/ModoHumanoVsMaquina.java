@@ -4,12 +4,10 @@ import com.uade.dominio.*;
 import com.uade.jugadores.MaquinaBasica;
 
 /**
- * Orquesta una partida Humano vs Maquina por consola (SDD roadmap Sprint 3).
- *
- * Controlador (GRASP): unico punto que corre el bucle de turnos, pide la
- * {@link Accion} a cada jugador a traves del port {@link Jugador} y traduce
- * cada {@link ResultadoTurno} a mensajes de consola. No conoce la heuristica
- * de la maquina ni la logica de particion — eso vive en el dominio.
+ * Orquesta una partida Humano vs Maquina por consola: corre el bucle de turnos,
+ * pide la {@link Accion} a cada jugador a traves del port {@link Jugador} y
+ * traduce cada {@link ResultadoTurno} a mensajes de consola. No conoce la
+ * heuristica de la maquina ni la logica de particion — eso vive en el dominio.
  */
 public class ModoHumanoVsMaquina {
 

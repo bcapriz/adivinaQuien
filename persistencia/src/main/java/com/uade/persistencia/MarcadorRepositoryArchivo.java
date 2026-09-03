@@ -9,11 +9,11 @@ public class MarcadorRepositoryArchivo implements MarcadorRepository {
 
     @Override
     public void registrarVictoria(String usuario) {
-        throw new UnsupportedOperationException("Sprint 6");
+        throw new UnsupportedOperationException("todavia no implementado");
     }
 
     @Override
     public List<Map.Entry<String, Integer>> top() {
-        throw new UnsupportedOperationException("Sprint 6");
+        throw new UnsupportedOperationException("todavia no implementado");
     }
 }

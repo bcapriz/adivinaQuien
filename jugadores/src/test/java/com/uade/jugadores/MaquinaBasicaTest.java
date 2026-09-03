@@ -33,11 +33,7 @@ class MaquinaBasicaTest {
     }
 
     private EstadoDePartidaVisible estado(EspacioDeBusqueda espacio, List<Filtro> historialPropio) {
-        return new EstadoDePartidaVisible() {
-            @Override public EspacioDeBusqueda getEspacioDeBusqueda()       { return espacio; }
-            @Override public List<Filtro>       getHistorialFiltros()        { return historialPropio; }
-            @Override public List<Filtro>       getHistorialFiltrosRival()   { return List.of(); }
-        };
+        return EstadoFake.conHistorialPropio(espacio, historialPropio);
     }
 
     private Categoria categoriaDe(Accion accion) {

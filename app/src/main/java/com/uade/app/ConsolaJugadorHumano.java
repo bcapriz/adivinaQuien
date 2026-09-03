@@ -5,10 +5,10 @@ import com.uade.dominio.*;
 import java.util.List;
 
 /**
- * Adapter (SDD 5.3) del port {@link Jugador}: traduce la interaccion por consola
- * en una {@link Accion} del dominio. No contiene reglas de juego — solo lee
- * opciones del usuario y construye objetos de dominio. Toda la E/S pasa por
- * {@link Consola}, asi las maquinas nunca dependen de metodos de consola (ISP).
+ * Adapta la interaccion por consola al port {@link Jugador}: traduce lo que
+ * ingresa el usuario en una {@link Accion} del dominio. No contiene reglas de
+ * juego — solo lee opciones y construye objetos de dominio. Toda la E/S pasa por
+ * {@link Consola}.
  */
 public class ConsolaJugadorHumano implements Jugador {
 

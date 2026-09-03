@@ -3,8 +3,8 @@ package com.uade.app;
 import com.uade.dominio.RegistroDePersonajes;
 
 /**
- * Composition root. Por ahora solo lanza el modo Humano vs Maquina por consola
- * (Sprint 3). En el Sprint 7 pasa a elegir consola o GUI JavaFX segun un flag.
+ * Composition root. Arma las dependencias concretas y lanza el modo Humano vs
+ * Maquina por consola.
  */
 public class Main {
 
