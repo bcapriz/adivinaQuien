@@ -11,20 +11,29 @@ import com.uade.jugadores.MaquinaBasica;
  */
 public class ModoHumanoVsMaquina {
 
+    private static final String NOMBRE_MAQUINA = "Maquina Basica";
+
     private final Consola consola;
+    private final MarcadorRepository marcador;
     private final Jugador maquina;
 
-    public ModoHumanoVsMaquina(Consola consola) {
-        this(consola, new MaquinaBasica());
+    public ModoHumanoVsMaquina(Consola consola, MarcadorRepository marcador) {
+        this(consola, marcador, new MaquinaBasica());
     }
 
-    ModoHumanoVsMaquina(Consola consola, Jugador maquina) {
+    ModoHumanoVsMaquina(Consola consola, MarcadorRepository marcador, Jugador maquina) {
         this.consola = consola;
+        this.marcador = marcador;
         this.maquina = maquina;
     }
 
     public void jugar(RegistroDePersonajes registro) {
         consola.mostrar("=== Adivina Quien - Humano vs Maquina ===");
+        consola.mostrar("Tu nombre: ");
+        String nombre = consola.leerLinea().trim();
+        if (nombre.isEmpty()) {
+            nombre = "Jugador";
+        }
 
         Jugador humano = new ConsolaJugadorHumano(consola);
         Partida partida = new Partida(humano, maquina, registro);
@@ -37,6 +46,8 @@ public class ModoHumanoVsMaquina {
 
         boolean ganoHumano = partida.ganador() == humano;
         consola.mostrar("\n=== " + (ganoHumano ? "Ganaste!" : "Gano la maquina.") + " ===");
+        marcador.registrarVictoria(ganoHumano ? nombre : NOMBRE_MAQUINA);
+        VistaMarcador.imprimir(consola, marcador);
     }
 
     private void narrar(ResultadoTurno resultado, Jugador humano) {
