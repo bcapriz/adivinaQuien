@@ -46,8 +46,11 @@ public abstract class MotorDeBusquedaDeMaquina implements Jugador {
         Filtro filtro = elegirFiltro(estado);
         if (filtro == null) {
             // Ninguna categoría disponible separa el espacio (personajes
-            // indistinguibles o categorías agotadas): se adivina a ciegas.
-            return new Accion.Adivinanza(espacio.getCandidatos().get(0));
+            // indistinguibles o categorías agotadas): se adivina a ciegas un
+            // candidato al azar, así turnos sucesivos prueban candidatos
+            // distintos en vez de repetir siempre el mismo.
+            List<Personaje> candidatos = espacio.getCandidatos();
+            return new Accion.Adivinanza(candidatos.get(random.nextInt(candidatos.size())));
         }
         return new Accion.AplicarFiltro(filtro);
     }

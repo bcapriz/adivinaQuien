@@ -4,6 +4,9 @@ target/
 !**/src/test/**/target/
 .kotlin
 
+# Marcador persistido en runtime
+marcador.properties
+
 ### IntelliJ IDEA ###
 .idea/
 *.iws
@@ -34,3 +37,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Config local de agentes/IDE (por maquina, no del equipo) ###
+.mcp.json
+.claude/settings.local.json

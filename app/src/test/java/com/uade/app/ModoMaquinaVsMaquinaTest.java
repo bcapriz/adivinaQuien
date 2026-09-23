@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ModoMaquinaVsMaquinaTest {
 
     private final RegistroDePersonajes registro = PersonajesDeEjemplo.cargar();
+    private final MarcadorFake marcador = new MarcadorFake();
 
     private Jugador conSecreto(Personaje secreto, Accion... jugadasPorTurno) {
         return new Jugador() {
@@ -37,13 +38,14 @@ class ModoMaquinaVsMaquinaTest {
                 new Accion.AplicarFiltro(new Filtro(Categoria.LENTES, Boolean.FALSE)));   // nunca adivina
 
         var consola = new ConsolaFake();
-        new ModoMaquinaVsMaquina(consola, m1, m2).jugar(registro);
+        new ModoMaquinaVsMaquina(consola, marcador, m1, m2).jugar(registro);
 
         assertTrue(consola.salidas.stream().anyMatch(
                 s -> s.startsWith("M1") && s.contains("GENERO=MASCULINO") && s.contains("SI") && s.contains("13 candidatos")));
         assertTrue(consola.salidas.stream().anyMatch(s -> s.startsWith("M2") && s.contains("filtro")));
         assertTrue(consola.mostroAlgunaQueContiene("adivina Gonzalo"));
         assertTrue(consola.mostroAlgunaQueContiene("Gana M1"));
+        assertEquals(1, marcador.victorias.get("Maquina Basica"));
     }
 
     @Test
@@ -54,8 +56,9 @@ class ModoMaquinaVsMaquinaTest {
         Accion filtroInocuo = new Accion.AplicarFiltro(new Filtro(Categoria.GENERO, Genero.MASCULINO));
 
         var consola = new ConsolaFake();
-        new ModoMaquinaVsMaquina(consola, conSecreto(a, filtroInocuo), conSecreto(b, filtroInocuo)).jugar(registro);
+        new ModoMaquinaVsMaquina(consola, marcador, conSecreto(a, filtroInocuo), conSecreto(b, filtroInocuo)).jugar(registro);
 
         assertTrue(consola.mostroAlgunaQueContiene("Sin ganador"));
+        assertTrue(marcador.victorias.isEmpty());
     }
 }

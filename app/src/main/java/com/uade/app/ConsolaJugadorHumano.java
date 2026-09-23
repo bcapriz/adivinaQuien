@@ -20,9 +20,9 @@ public class ConsolaJugadorHumano implements Jugador {
 
     @Override
     public Personaje elegirPersonaje(RegistroDePersonajes registro, List<Personaje> yaElegidos) {
-        List<Personaje> disponibles = registro.listar().stream()
+        List<Personaje> disponibles = OrdenadorDePersonajes.ordenarPorNombre(registro.listar().stream()
                 .filter(p -> !yaElegidos.contains(p))
-                .toList();
+                .toList());
 
         consola.mostrar("\n== Elegi tu personaje secreto ==");
         for (Personaje p : disponibles) {

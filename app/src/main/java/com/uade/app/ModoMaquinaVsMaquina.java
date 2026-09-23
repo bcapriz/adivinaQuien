@@ -14,18 +14,22 @@ import java.util.List;
 public class ModoMaquinaVsMaquina implements ObservadorDePartida {
 
     private static final int TOPE_DE_TURNOS = 500;
+    private static final String NOMBRE_M1 = "Maquina Basica";
+    private static final String NOMBRE_M2 = "Maquina Asertiva";
 
     private final Consola consola;
+    private final MarcadorRepository marcador;
     private final Jugador maquina1;
     private final Jugador maquina2;
 
-    public ModoMaquinaVsMaquina(Consola consola) {
+    public ModoMaquinaVsMaquina(Consola consola, MarcadorRepository marcador) {
         // Máquina 2 arranca con ventaja informativa: lee los filtros de Máquina 1.
-        this(consola, new MaquinaBasica(), new MaquinaAsertiva(true));
+        this(consola, marcador, new MaquinaBasica(), new MaquinaAsertiva(true));
     }
 
-    ModoMaquinaVsMaquina(Consola consola, Jugador maquina1, Jugador maquina2) {
+    ModoMaquinaVsMaquina(Consola consola, MarcadorRepository marcador, Jugador maquina1, Jugador maquina2) {
         this.consola = consola;
+        this.marcador = marcador;
         this.maquina1 = maquina1;
         this.maquina2 = maquina2;
     }
@@ -43,7 +47,11 @@ public class ModoMaquinaVsMaquina implements ObservadorDePartida {
         }
         if (!partida.estaTerminada()) {
             consola.mostrar("\nSin ganador tras " + TOPE_DE_TURNOS + " turnos (personajes indistinguibles).");
+            return;
         }
+
+        marcador.registrarVictoria(partida.ganador() == maquina1 ? NOMBRE_M1 : NOMBRE_M2);
+        VistaMarcador.imprimir(consola, marcador);
     }
 
     @Override
