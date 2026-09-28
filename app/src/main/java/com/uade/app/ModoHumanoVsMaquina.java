@@ -61,6 +61,8 @@ public class ModoHumanoVsMaquina {
         } else if (accion instanceof Accion.Adivinanza a) {
             String desenlace = resultado.isPartidaTerminada() ? "ACERTO" : "erro";
             consola.mostrar(quien + "  ->  adivina " + a.personaje().getNombre() + "  ->  " + desenlace);
+        } else if (accion instanceof Accion.Rendirse) {
+            consola.mostrar(quien + "  ->  se rindio");
         }
     }
 }

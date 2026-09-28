@@ -73,6 +73,30 @@ class PartidaTest {
         assertFalse(partida.estaTerminada());
     }
 
+    @Test
+    void adivinanzaIncorrectaDescartaAlPersonajeDelPropioEspacio() {
+        Jugador a = jugadorFijo(ana, new Accion.Adivinanza(carla)); // carla != bob (el secreto de B)
+        Jugador b = soloElije(bob);
+
+        var partida = new Partida(a, b, registro);
+        var resultado = partida.jugarTurno();
+
+        assertFalse(resultado.getCandidatos().contains(carla));
+        assertEquals(3, resultado.getCandidatosRestantes());
+    }
+
+    @Test
+    void rendirseTerminaLaPartidaYGanaElRival() {
+        Jugador a = jugadorFijo(ana, new Accion.Rendirse());
+        Jugador b = soloElije(bob);
+
+        var partida = new Partida(a, b, registro);
+        var resultado = partida.jugarTurno();
+
+        assertTrue(resultado.isPartidaTerminada());
+        assertEquals(b, partida.ganador());
+    }
+
     // --- filtro ---
 
     @Test

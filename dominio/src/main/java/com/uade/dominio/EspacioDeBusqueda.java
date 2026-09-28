@@ -54,6 +54,16 @@ public class EspacioDeBusqueda {
         return new EspacioDeBusqueda(restantes);
     }
 
+    /**
+     * Una adivinanza incorrecta también es información: descarta a ese
+     * candidato del propio espacio, sin terminar la partida.
+     */
+    public EspacioDeBusqueda descartar(Personaje personaje) {
+        List<Personaje> restantes = new ArrayList<>(candidatos);
+        restantes.remove(personaje);
+        return new EspacioDeBusqueda(restantes);
+    }
+
     public int tamanio() {
         return candidatos.size();
     }

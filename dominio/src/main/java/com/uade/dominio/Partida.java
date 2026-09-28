@@ -61,6 +61,9 @@ public class Partida {
             if (evaluarAdivinanza(a, secretoRival)) {
                 terminada = true;
                 ganador   = turnoActual;
+            } else {
+                EspacioDeBusqueda reducido = espacioPropio.descartar(a.personaje());
+                if (esA) espacioA = reducido; else espacioB = reducido;
             }
         } else if (accion instanceof Accion.AplicarFiltro f) {
             /*
@@ -75,14 +78,17 @@ public class Partida {
             EspacioDeBusqueda reducido = espacioPropio.aplicarFiltro(f.filtro(), respuestaFiltro);
             historialPropio.add(f.filtro());
             if (esA) espacioA = reducido; else espacioB = reducido;
+        } else if (accion instanceof Accion.Rendirse) {
+            terminada = true;
+            ganador   = esA ? jugadorB : jugadorA;
         }
 
         Jugador jugadorDelTurno = turnoActual;
         turnoActual = esA ? jugadorB : jugadorA;
 
-        int candidatosRestantes = (esA ? espacioA : espacioB).tamanio();
+        List<Personaje> candidatos = (esA ? espacioA : espacioB).getCandidatos();
         ResultadoTurno resultado = new ResultadoTurno(
-                jugadorDelTurno, accion, respuestaFiltro, candidatosRestantes, terminada, ganador);
+                jugadorDelTurno, accion, respuestaFiltro, candidatos, terminada, ganador);
 
         observadores.forEach(observador -> observador.onTurnoJugado(resultado));
         if (terminada) {

@@ -1,20 +1,22 @@
 package com.uade.dominio;
 
+import java.util.List;
+
 public class ResultadoTurno {
 
     private final Jugador jugador;
     private final Accion accion;
     private final Boolean respuestaFiltro; // si/no cuando la accion fue AplicarFiltro; null si fue Adivinanza
-    private final int candidatosRestantes;
+    private final List<Personaje> candidatos;
     private final boolean partidaTerminada;
     private final Jugador ganador;
 
     public ResultadoTurno(Jugador jugador, Accion accion, Boolean respuestaFiltro,
-                          int candidatosRestantes, boolean partidaTerminada, Jugador ganador) {
+                          List<Personaje> candidatos, boolean partidaTerminada, Jugador ganador) {
         this.jugador = jugador;
         this.accion = accion;
         this.respuestaFiltro = respuestaFiltro;
-        this.candidatosRestantes = candidatosRestantes;
+        this.candidatos = candidatos;
         this.partidaTerminada = partidaTerminada;
         this.ganador = ganador;
     }
@@ -29,8 +31,10 @@ public class ResultadoTurno {
      */
     public Boolean getRespuestaFiltro() { return respuestaFiltro; }
 
-    /** Cantidad de candidatos que le quedan al jugador del turno tras jugar esta accion. */
-    public int getCandidatosRestantes() { return candidatosRestantes; }
+    /** Candidatos que le quedan al jugador del turno tras jugar esta accion. */
+    public List<Personaje> getCandidatos() { return candidatos; }
+
+    public int getCandidatosRestantes() { return candidatos.size(); }
 
     public boolean isPartidaTerminada() { return partidaTerminada; }
     public Jugador getGanador() { return ganador; }

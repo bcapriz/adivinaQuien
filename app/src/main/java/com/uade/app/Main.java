@@ -4,6 +4,7 @@ import com.uade.dominio.MarcadorRepository;
 import com.uade.dominio.RegistroDePersonajes;
 import com.uade.persistencia.MarcadorRepositoryArchivo;
 
+import javax.swing.SwingUtilities;
 import java.nio.file.Path;
 
 /**
@@ -12,12 +13,23 @@ import java.nio.file.Path;
 public class Main {
 
     public static void main(String[] args) {
-        Consola consola = new ConsolaEstandar();
         RegistroDePersonajes registro = PersonajesDeEjemplo.cargar();
         MarcadorRepository marcador = new MarcadorRepositoryArchivo(Path.of("marcador.properties"));
 
-        consola.mostrar("=== Adivina Quien ===");
-        consola.mostrar("1) Humano vs Maquina");
+        if (args.length > 0 && args[0].equals("--gui")) {
+            lanzarGui(registro, marcador);
+            return;
+        }
+
+        Consola consola = new ConsolaEstandar();
+        mostrarBienvenida(consola);
+
+        if (consola.leerLinea().trim().equals("2")) {
+            lanzarGui(registro, marcador);
+            return;
+        }
+
+        consola.mostrar("\n1) Humano vs Maquina");
         consola.mostrar("2) Espectador: Maquina vs Maquina");
         consola.mostrar("Opcion: ");
 
@@ -26,5 +38,21 @@ public class Main {
         } else {
             new ModoHumanoVsMaquina(consola, marcador).jugar(registro);
         }
+    }
+
+    private static void mostrarBienvenida(Consola consola) {
+        consola.mostrar("======================================");
+        consola.mostrar("            ADIVINA QUIEN");
+        consola.mostrar("======================================");
+        consola.mostrar("Bienvenido!");
+        consola.mostrar("");
+        consola.mostrar("¿Como queres jugar?");
+        consola.mostrar("1) Por consola");
+        consola.mostrar("2) Con interfaz grafica");
+        consola.mostrar("Opcion: ");
+    }
+
+    private static void lanzarGui(RegistroDePersonajes registro, MarcadorRepository marcador) {
+        SwingUtilities.invokeLater(() -> new VentanaJuego(registro, marcador).setVisible(true));
     }
 }
