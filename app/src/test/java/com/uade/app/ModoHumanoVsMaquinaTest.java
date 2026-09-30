@@ -30,7 +30,7 @@ class ModoHumanoVsMaquinaTest {
                 "2",     // opcion: adivinar
                 "7");    // adivina id 7
 
-        new ModoHumanoVsMaquina(consola, marcador, maquinaFija(secretoMaquina, jugadaInocua)).jugar(registro);
+        new ModoHumanoVsMaquina(consola, marcador, maquinaFija(secretoMaquina, jugadaInocua), "Maquina Basica").jugar(registro);
 
         assertTrue(consola.mostroAlgunaQueContiene("Ganaste!"));
         assertTrue(consola.mostroAlgunaQueContiene("ACERTO"));
@@ -47,7 +47,7 @@ class ModoHumanoVsMaquinaTest {
                 "1",               // elegir personaje propio (id 1)
                 "1", "1", "1");    // turno 1: filtro -> genero -> masculino (no termina)
 
-        new ModoHumanoVsMaquina(consola, marcador, maquinaFija(secretoMaquina, maquinaAdivina)).jugar(registro);
+        new ModoHumanoVsMaquina(consola, marcador, maquinaFija(secretoMaquina, maquinaAdivina), "Maquina Basica").jugar(registro);
 
         assertTrue(consola.mostroAlgunaQueContiene("Gano la maquina."));
         assertEquals(1, marcador.victorias.get("Maquina Basica"));
@@ -60,7 +60,7 @@ class ModoHumanoVsMaquinaTest {
         Accion maquinaAdivina = new Accion.Adivinanza(registro.listar().get(1));
         var consola = new ConsolaFake("Bruno", "2", "1", "1", "1"); // nombre; elige id 2; filtro -> genero -> masculino
 
-        new ModoHumanoVsMaquina(consola, marcador, maquinaFija(secretoMaquina, maquinaAdivina)).jugar(registro);
+        new ModoHumanoVsMaquina(consola, marcador, maquinaFija(secretoMaquina, maquinaAdivina), "Maquina Basica").jugar(registro);
 
         // el secreto de la maquina (id 1) es MASCULINO -> la respuesta al filtro es SI
         assertTrue(consola.salidas.stream().anyMatch(s -> s.contains("filtro") && s.contains("SI")));

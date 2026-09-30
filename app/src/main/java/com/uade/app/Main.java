@@ -1,7 +1,10 @@
 package com.uade.app;
 
+import com.uade.dominio.Jugador;
 import com.uade.dominio.MarcadorRepository;
 import com.uade.dominio.RegistroDePersonajes;
+import com.uade.jugadores.MaquinaAsertiva;
+import com.uade.jugadores.MaquinaBasica;
 import com.uade.persistencia.MarcadorRepositoryArchivo;
 
 import javax.swing.SwingUtilities;
@@ -36,7 +39,14 @@ public class Main {
         if (consola.leerLinea().trim().equals("2")) {
             new ModoMaquinaVsMaquina(consola, marcador).jugar(registro);
         } else {
-            new ModoHumanoVsMaquina(consola, marcador).jugar(registro);
+            consola.mostrar("\n¿Contra que maquina jugas?");
+            consola.mostrar("1) Maquina Basica");
+            consola.mostrar("2) Maquina Asertiva");
+            consola.mostrar("Opcion: ");
+            boolean asertiva = consola.leerLinea().trim().equals("2");
+            Jugador maquina = asertiva ? new MaquinaAsertiva() : new MaquinaBasica();
+            String nombreMaquina = asertiva ? "Maquina Asertiva" : "Maquina Basica";
+            new ModoHumanoVsMaquina(consola, marcador, maquina, nombreMaquina).jugar(registro);
         }
     }
 

@@ -12,7 +12,8 @@ import java.util.Map;
 public class VentanaJuego extends JFrame {
 
     private static final String NOMBRE_HUMANO = "Vos";
-    private static final String NOMBRE_MAQUINA = "Maquina Basica";
+    private static final String NOMBRE_MAQUINA_BASICA = "Maquina Basica";
+    private static final String NOMBRE_MAQUINA_ASERTIVA = "Maquina Asertiva";
     private static final int PAUSA_ENTRE_TURNOS_MS = 1500;
 
     private final RegistroDePersonajes registro;
@@ -64,11 +65,16 @@ public class VentanaJuego extends JFrame {
     }
 
     private void iniciarHumanoVsMaquina() {
+        Jugador maquina = elegirMaquina();
+        if (maquina == null) {
+            return; // cancelo el dialogo, me quedo en la pantalla de inicio
+        }
+        String nombreMaquina = maquina instanceof MaquinaAsertiva ? NOMBRE_MAQUINA_ASERTIVA : NOMBRE_MAQUINA_BASICA;
+
         TableroPersonajesPanel tablero = new TableroPersonajesPanel(registro.listar());
         PanelDeJugada panelDeJugada = new PanelDeJugada();
-        MarcadorSuperior encabezado = new MarcadorSuperior(marcador, NOMBRE_HUMANO, NOMBRE_MAQUINA);
+        MarcadorSuperior encabezado = new MarcadorSuperior(marcador, NOMBRE_HUMANO, nombreMaquina);
         SwingJugadorHumano humano = new SwingJugadorHumano(this, panelDeJugada);
-        Jugador maquina = new MaquinaBasica();
 
         JPanel juego = new JPanel(new BorderLayout());
         JScrollPane scrollTablero = new JScrollPane(tablero);
@@ -78,7 +84,7 @@ public class VentanaJuego extends JFrame {
         juego.add(panelDeJugada, BorderLayout.EAST);
         mostrarPantalla(juego);
 
-        Map<Jugador, String> nombres = Map.of(humano, NOMBRE_HUMANO, maquina, NOMBRE_MAQUINA);
+        Map<Jugador, String> nombres = Map.of(humano, NOMBRE_HUMANO, maquina, nombreMaquina);
         ObservadorDePartida observer = new PartidaObserverSwing(
                 panelDeJugada::agregarLinea, Map.of(humano, tablero), nombres);
 
@@ -88,12 +94,25 @@ public class VentanaJuego extends JFrame {
                 partida.jugarTurno();
             }
             boolean ganoHumano = partida.ganador() == humano;
-            marcador.registrarVictoria(ganoHumano ? NOMBRE_HUMANO : NOMBRE_MAQUINA);
+            marcador.registrarVictoria(ganoHumano ? NOMBRE_HUMANO : nombreMaquina);
             SwingUtilities.invokeLater(() -> {
                 encabezado.actualizar();
                 preguntarSiJuegaDeNuevo(ganoHumano);
             });
         }, "hilo-partida").start();
+    }
+
+    /** HU-9: el jugador elige contra cual de las dos maquinas juega esa partida. */
+    private Jugador elegirMaquina() {
+        Object[] opciones = {NOMBRE_MAQUINA_BASICA, NOMBRE_MAQUINA_ASERTIVA};
+        int eleccion = JOptionPane.showOptionDialog(this,
+                "¿Contra que maquina queres jugar?", "Elegi tu rival",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, opciones, opciones[0]);
+        if (eleccion == JOptionPane.CLOSED_OPTION) {
+            return null;
+        }
+        return eleccion == 1 ? new MaquinaAsertiva() : new MaquinaBasica();
     }
 
     private void preguntarSiJuegaDeNuevo(boolean ganoHumano) {
@@ -107,8 +126,8 @@ public class VentanaJuego extends JFrame {
     }
 
     private void iniciarEspectador() {
-        String nombreM1 = "Maquina Basica";
-        String nombreM2 = "Maquina Asertiva";
+        String nombreM1 = NOMBRE_MAQUINA_BASICA;
+        String nombreM2 = NOMBRE_MAQUINA_ASERTIVA;
         Jugador m1 = new MaquinaBasica();
         Jugador m2 = new MaquinaAsertiva(true);
 
@@ -150,6 +169,14 @@ public class VentanaJuego extends JFrame {
                 SwingUtilities.invokeLater(() -> {
                     encabezado.actualizar();
                     mostrarMarcador();
+                    cardLayout.show(raiz, "inicio");
+                });
+            } else {
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(this,
+                            "Sin ganador tras 500 turnos (personajes indistinguibles).",
+                            "Fin de la partida", JOptionPane.INFORMATION_MESSAGE);
+                    cardLayout.show(raiz, "inicio");
                 });
             }
         }, "hilo-partida").start();

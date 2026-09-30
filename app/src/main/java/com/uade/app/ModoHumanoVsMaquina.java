@@ -1,30 +1,28 @@
 package com.uade.app;
 
 import com.uade.dominio.*;
-import com.uade.jugadores.MaquinaBasica;
 
 /**
  * Orquesta una partida Humano vs Maquina por consola: corre el bucle de turnos,
  * pide la {@link Accion} a cada jugador a traves del port {@link Jugador} y
  * traduce cada {@link ResultadoTurno} a mensajes de consola. No conoce la
  * heuristica de la maquina ni la logica de particion — eso vive en el dominio.
+ * Tampoco conoce el tipo concreto de la maquina (HU-9: la elige quien arma
+ * este modo, ver {@link Main}), por eso el nombre para el marcador viene
+ * inyectado en vez de inferirse con un {@code instanceof}.
  */
 public class ModoHumanoVsMaquina {
-
-    private static final String NOMBRE_MAQUINA = "Maquina Basica";
 
     private final Consola consola;
     private final MarcadorRepository marcador;
     private final Jugador maquina;
+    private final String nombreMaquina;
 
-    public ModoHumanoVsMaquina(Consola consola, MarcadorRepository marcador) {
-        this(consola, marcador, new MaquinaBasica());
-    }
-
-    ModoHumanoVsMaquina(Consola consola, MarcadorRepository marcador, Jugador maquina) {
+    public ModoHumanoVsMaquina(Consola consola, MarcadorRepository marcador, Jugador maquina, String nombreMaquina) {
         this.consola = consola;
         this.marcador = marcador;
         this.maquina = maquina;
+        this.nombreMaquina = nombreMaquina;
     }
 
     public void jugar(RegistroDePersonajes registro) {
@@ -46,7 +44,7 @@ public class ModoHumanoVsMaquina {
 
         boolean ganoHumano = partida.ganador() == humano;
         consola.mostrar("\n=== " + (ganoHumano ? "Ganaste!" : "Gano la maquina.") + " ===");
-        marcador.registrarVictoria(ganoHumano ? nombre : NOMBRE_MAQUINA);
+        marcador.registrarVictoria(ganoHumano ? nombre : nombreMaquina);
         VistaMarcador.imprimir(consola, marcador);
     }
 
